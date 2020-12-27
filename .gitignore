@@ -1,4 +1,3 @@
 .idea/
-login/.idea
-login/venv/
-/venv/
+login/.idea/
+login/venv
