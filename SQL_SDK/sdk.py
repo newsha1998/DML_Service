@@ -9,72 +9,85 @@ spark = SparkSession.builder \
     .config("header", "true") \
     .getOrCreate() 
 
-def run_sql(sqlcommand,dataframe):
+def CreateDatabase(databaseName):
+    spark.sql('CREATE DATABASE ' + databaseName)
+    print('Database Created.')
+
+def CreateTable(tablealiasname,columnnametype='id INT, name STRING, age INT'):
+    #spark.sql('CREATE  TABLE ' + tablealiasname + '(' + columnnametype +') USING csv OPTIONS(PATH \'' + tablealiasname +'.csv \' )')
+    print('Table' , tablealiasname, 'created.')
+
+
+def InsertDate(tablealiasname,cloumnvalue=' 101 , \'123 Park Ave, San Jose \', 111111'):
+    spark.sql ('INSERT INTO ' +tablealiasname + ' VALUES (' +cloumnvalue + ')')
+    print('Insert in to ' + tablealiasname + 'Done.')
+
+def Run_Sql(sqlcommand):
     spark.sql(sqlcommand).show()
 
-def importt(path,DataframName='Test',type='csv',header="true"):
+def ImportData(path,tablealiasname='Test',type='csv',header="true"):
     
     if type=="csv" : 
         df =spark.read.format("csv").option("header",header).load(path)  
-        df.createOrReplaceTempView(DataframName)
+        df.createOrReplaceTempView(tablealiasname)
         print("=== Print out schema ===")
         df.printSchema()
         return df
     elif type=="json":
         df =spark.read.format("json").option("header",header).load(path)  
-        df.createOrReplaceTempView(DataframName)
+        df.createOrReplaceTempView(tablealiasname)
         print("=== Print out schema ===")
         df.printSchema()
         return df
 
-def ShowColumn(dataframe):   
-    print("Number of the column:" + str(len(dataframe.columns)) )
-    df_list=dataframe.dtypes 
+def ShowColumn(tablename):   
+    print("Number of the column:" + str(len(tablename.columns)) )
+    df_list=tablename.dtypes 
     for i in df_list:
           print(i)
 
 
-def ChangeColumntype(dataframe,columnName,newtype):
+def ChangeColumnType(tablename,columnName,newtype):
     if newtype=="Float":
-        dataframe=dataframe.withColumn(columnName,dataframe[columnName].cast(FloatType()))
+        tablename=tablename.withColumn(columnName,tablename[columnName].cast(FloatType()))
         print("done")
-        return dataframe
+        return tablename
     elif newtype=="String":
-        dataframe=dataframe.withColumn(columnName,dataframe[columnName].cast(StringType()))
+        tablename=tablename.withColumn(columnName,tablename[columnName].cast(StringType()))
         print("done")
-        return dataframe
+        return tablename
     elif newtype=="Integer":
-        dataframe=dataframe.withColumn(columnName,dataframe[columnName].cast(IntegerType()))
+        tablename=tablename.withColumn(columnName,tablename[columnName].cast(IntegerType()))
         print("done")
-        return dataframe
+        return tablename
     
 
-def ChangeColumnName(dataframe,columnNameOld,ColumnNameNew):
-    dataframe=dataframe.withColumnRenamed(columnNameOld,ColumnNameNew)
+def ChangeColumnName(tablename,columnNameOld,ColumnNameNew):
+    tablename=tablename.withColumnRenamed(columnNameOld,ColumnNameNew)
     print("done")
-    return dataframe
+    return tablename
 
 
-def AddColumn(dataframe,dataframeName='Test',columnName='test1',columnType="String",defaultValue=None):
+def AddColumn(tablename,tablealiasname='Test',columnName='test1',columnType="String",defaultValue=None):
     
     if columnType=="String":
-        dataframe=dataframe.withColumn(columnName,lit(defaultValue).cast(StringType()))
-        dataframe.createOrReplaceTempView(dataframeName)
+        tablename=tablename.withColumn(columnName,lit(defaultValue).cast(StringType()))
+        tablename.createOrReplaceTempView(tablealiasname)
         print("done")
-        return dataframe
+        return tablename
     elif columnType=="Integer":
-        dataframe=dataframe.withColumn(columnName,lit(defaultValue).cast(IntegerType()))
-        dataframe.createOrReplaceTempView(dataframeName)
+        tablename=tablename.withColumn(columnName,lit(defaultValue).cast(IntegerType()))
+        tablename.createOrReplaceTempView(tablealiasname)
         print("done")
-        return dataframe
+        return tablename
     elif columnType=="Float":
-        dataframe=dataframe.withColumn(columnName,lit(defaultValue).cast(FloatType()))
-        dataframe.createOrReplaceTempView(dataframeName)
+        tablename=tablename.withColumn(columnName,lit(defaultValue).cast(FloatType()))
+        tablename.createOrReplaceTempView(tablealiasname)
         print("done")
-        return dataframe
+        return tablename
 
-def dropNull(dataframe):
-    return dataframe.na.drop().show()
+def DropNull(tablename):
+    return tablename.na.drop().show()
   
-def Save(dataframe,outpath):
-    dataframe.write.csv(outpath)
+def Save(tablename,outpath):
+    tablename.write.csv(outpath)
